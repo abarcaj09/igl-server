@@ -160,6 +160,64 @@ describe("registering a new user", () => {
   });
 });
 
+describe("logging in a user", () => {
+  const existingUser = helper.intialUsers[0];
+
+  test("succeeds when account email and password are correct", async () => {
+    const userLogin = {
+      account: existingUser.email,
+      password: existingUser.password,
+    };
+
+    await api.post("/api/auth/login").send(userLogin).expect(201);
+  });
+
+  test("succeeds when account username and password are correct", async () => {
+    const userLogin = {
+      account: existingUser.username,
+      password: existingUser.password,
+    };
+
+    await api.post("/api/auth/login").send(userLogin).expect(201);
+  });
+
+  test("fails when account email is correct and password is incorrect", async () => {
+    const userLogin = {
+      account: existingUser.email,
+      password: "wrongpassword",
+    };
+
+    test("fails when account username is correct and password is incorrect", async () => {
+      const userLogin = {
+        account: existingUser.username,
+        password: "wrongpassword",
+      };
+
+      await api.post("/api/auth/login").send(userLogin).expect(400);
+    });
+
+    await api.post("/api/auth/login").send(userLogin).expect(400);
+  });
+
+  test("fails when account email is incorrect and password is correct", async () => {
+    const userLogin = {
+      account: "wrong@email.com",
+      password: existingUser.password,
+    };
+
+    await api.post("/api/auth/login").send(userLogin).expect(400);
+  });
+
+  test("fails when account username is incorrect and password is correct", async () => {
+    const userLogin = {
+      account: "wrongUsername",
+      password: existingUser.password,
+    };
+
+    await api.post("/api/auth/login").send(userLogin).expect(400);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
