@@ -5,13 +5,13 @@ const intialUsers = [
     name: "Joe A.",
     username: "joe1",
     email: "joe@email.com",
-    password: "joespassword",
+    password: "$2y$10$fQ.QR6HiPzEKbW9waP.zCuux30m1sVothHIRLX7kcz.NVyQHAVlIu", // hash for "joespassword"
   },
   {
     name: "Mary B.",
     username: "mary1",
     email: "mary@email.com",
-    password: "abc12345",
+    password: "$2y$10$.PgmHCJP0mKicPs5YI.Dx.ItYByn2p3xGyF95CglVK66MopAbBcGe", // hash for "abc12345"
   },
 ];
 

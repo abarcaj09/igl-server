@@ -3,7 +3,7 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
-const { validateRegister } = require("../utils/validators");
+const { validateRegister, validateLogin } = require("../utils/validators");
 
 const generateJWT = (user) => {
   const userInfo = { username: user.username, id: user.id };
@@ -34,6 +34,27 @@ authRouter.post("/register", validateRegister, async (req, res) => {
   const savedUser = await newUser.save();
   const token = generateJWT(savedUser);
   res.status(201).json({ token, username: savedUser.username });
+});
+
+authRouter.post("/login", validateLogin, async (req, res) => {
+  const { account, password } = req.body;
+
+  const user = account.includes("@")
+    ? await User.findOne({ email: account })
+    : await User.findOne({ username: account });
+
+  const passwordMatch = user
+    ? await bcrypt.compare(password, user.password)
+    : false;
+
+  if (!(user && passwordMatch)) {
+    return res.status(400).json({
+      error: "Incorrect username/email or password",
+    });
+  }
+
+  const token = generateJWT(user);
+  res.status(201).json({ token, username: user.username });
 });
 
 module.exports = authRouter;

@@ -49,4 +49,16 @@ const validateRegister = (req, res, next) => {
   next();
 };
 
-module.exports = { validateRegister };
+const validateLogin = (req, res, next) => {
+  const { account, password } = req.body;
+
+  if (!account) {
+    return res.status(400).json({ error: "Username/email is required" });
+  } else if (!password) {
+    return res.status(400).json({ error: "Password is required" });
+  }
+
+  next();
+};
+
+module.exports = { validateRegister, validateLogin };

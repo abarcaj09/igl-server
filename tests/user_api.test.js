@@ -161,12 +161,27 @@ describe("registering a new user", () => {
 });
 
 describe("logging in a user", () => {
-  const existingUser = helper.intialUsers[0];
+  let existingUser;
+
+  beforeEach(async () => {
+    await api.post("/api/auth/register").send({
+      name: "Jon C.",
+      username: "jonc",
+      email: "cjon@email.com",
+      password: "password",
+    });
+
+    existingUser = await User.findOne({ username: "jonc" });
+  });
+
+  afterEach(async () => {
+    await User.deleteOne({ username: "jonc" });
+  });
 
   test("succeeds when account email and password are correct", async () => {
     const userLogin = {
       account: existingUser.email,
-      password: existingUser.password,
+      password: "password",
     };
 
     await api.post("/api/auth/login").send(userLogin).expect(201);
@@ -175,7 +190,7 @@ describe("logging in a user", () => {
   test("succeeds when account username and password are correct", async () => {
     const userLogin = {
       account: existingUser.username,
-      password: existingUser.password,
+      password: "password",
     };
 
     await api.post("/api/auth/login").send(userLogin).expect(201);
@@ -187,14 +202,14 @@ describe("logging in a user", () => {
       password: "wrongpassword",
     };
 
-    test("fails when account username is correct and password is incorrect", async () => {
-      const userLogin = {
-        account: existingUser.username,
-        password: "wrongpassword",
-      };
+    await api.post("/api/auth/login").send(userLogin).expect(400);
+  });
 
-      await api.post("/api/auth/login").send(userLogin).expect(400);
-    });
+  test("fails when account username is correct and password is incorrect", async () => {
+    const userLogin = {
+      account: existingUser.username,
+      password: "wrongpassword",
+    };
 
     await api.post("/api/auth/login").send(userLogin).expect(400);
   });
@@ -202,7 +217,7 @@ describe("logging in a user", () => {
   test("fails when account email is incorrect and password is correct", async () => {
     const userLogin = {
       account: "wrong@email.com",
-      password: existingUser.password,
+      password: "password",
     };
 
     await api.post("/api/auth/login").send(userLogin).expect(400);
@@ -211,7 +226,7 @@ describe("logging in a user", () => {
   test("fails when account username is incorrect and password is correct", async () => {
     const userLogin = {
       account: "wrongUsername",
-      password: existingUser.password,
+      password: "password",
     };
 
     await api.post("/api/auth/login").send(userLogin).expect(400);
