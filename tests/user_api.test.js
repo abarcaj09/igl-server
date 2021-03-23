@@ -145,11 +145,11 @@ describe("registering a new user", () => {
     expect(usersAtEnd).toHaveLength(helper.intialUsers.length);
   });
 
-  test("fails with status code 400 if email is not in a valid format (valid format is 'something'@'something'.'something'", async () => {
+  test("fails with status code 400 if email is not in a valid format (valid format is 'something'@'something'[.'something']", async () => {
     const newUser = {
       name: "Joe C.",
       username: "joe2",
-      email: "jc@email",
+      email: "jcemail.com",
       password: "password",
     };
 
