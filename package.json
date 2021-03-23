@@ -4,7 +4,7 @@
   "description": "Server for igl site",
   "main": "server.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --passWithNoTests --verbose --runInBand ",
+    "test": "cross-env NODE_ENV=test jest  --verbose --runInBand ",
     "start": "cross-env NODE_ENV=production node server.js",
     "dev": "cross-env NODE_ENV=development nodemon server.js"
   },

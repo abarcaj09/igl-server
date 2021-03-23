@@ -20,4 +20,8 @@ const allUsers = async () => {
   return users.map((user) => user.toJSON());
 };
 
-module.exports = { intialUsers, allUsers };
+// biography must be less than 150 characters long
+const invalidLengthBio =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis"; // 151 characters
+
+module.exports = { intialUsers, allUsers, invalidLengthBio };
