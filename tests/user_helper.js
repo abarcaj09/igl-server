@@ -17,7 +17,7 @@ const intialUsers = [
 
 const allUsers = async () => {
   const users = await User.find({});
-  return users.map((user = user.toJSON()));
+  return users.map((user) => user.toJSON());
 };
 
 module.exports = { intialUsers, allUsers };
