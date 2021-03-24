@@ -92,6 +92,57 @@ describe("Editing a user", () => {
   });
 });
 
+describe("following a user", () => {
+  test("adds the user if the requesting user WASN'T already following", async () => {
+    const toFollow = helper.intialUsers[0];
+    await api
+      .post(`/api/users/${toFollow.username}/follow`)
+      .set("Authorization", config)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const requestingUser = await User.findOne({ username: testUser.username });
+    const userToFollow = await User.findOne({ username: toFollow.username });
+
+    expect(requestingUser.following).toContain(userToFollow.id);
+    expect(userToFollow.followers).toContain(requestingUser.id);
+  });
+
+  test("removes the user if the requesting user WAS already following", async () => {
+    const toFollow = helper.intialUsers[0];
+    // follow the user first
+    await api
+      .post(`/api/users/${toFollow.username}/follow`)
+      .set("Authorization", config);
+
+    await api
+      .post(`/api/users/${toFollow.username}/follow`)
+      .set("Authorization", config)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const requestingUser = await User.findOne({ username: testUser.username });
+    const userToFollow = await User.findOne({ username: toFollow.username });
+
+    expect(requestingUser.following).not.toContain(userToFollow.id);
+    expect(userToFollow.followers).not.toContain(requestingUser.id);
+  });
+
+  test("fails with status code 400 if the user to follow does not exist", async () => {
+    await api
+      .post("/api/users/DoesNotExist/follow")
+      .set("Authorization", config)
+      .expect(400);
+  });
+
+  test("fails with status code 400 if the requesting user attempts to follow themself", async () => {
+    await api
+      .post(`/api/users/${testUser.username}/follow`)
+      .set("Authorization", config)
+      .expect(400);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
