@@ -13,6 +13,24 @@ const intialUsers = [
     email: "mary@email.com",
     password: "$2y$10$.PgmHCJP0mKicPs5YI.Dx.ItYByn2p3xGyF95CglVK66MopAbBcGe", // hash for "abc12345"
   },
+  {
+    name: "Eric C.",
+    username: "eric1",
+    email: "eric@email.com",
+    password: "$2y$10$.PgmHCJP0mKicPs5YI.Dx.ItYByn2p3xGyF95CglVK66MopAbBcGe", // hash for "abc12345"
+  },
+  {
+    name: "Sue D.",
+    username: "sue1",
+    email: "sue@email.com",
+    password: "$2y$10$.PgmHCJP0mKicPs5YI.Dx.ItYByn2p3xGyF95CglVK66MopAbBcGe", // hash for "abc12345"
+  },
+  {
+    name: "May E.",
+    username: "may1",
+    email: "may@email.com",
+    password: "$2y$10$.PgmHCJP0mKicPs5YI.Dx.ItYByn2p3xGyF95CglVK66MopAbBcGe", // hash for "abc12345"
+  },
 ];
 
 const allUsers = async () => {

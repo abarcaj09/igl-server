@@ -143,6 +143,45 @@ describe("following a user", () => {
   });
 });
 
+describe("getting suggested profiles", () => {
+  test("succeeds when the user gets their own suggestions and the retrieved suggestions are not followed by the user and at most 3 suggestions are received", async () => {
+    const toFollow = helper.intialUsers[0];
+    // follow a user first
+    await api
+      .post(`/api/users/${toFollow.username}/follow`)
+      .set("Authorization", config);
+
+    const response = await api
+      .get(`/api/users/${testUser.username}/suggestions`)
+      .set("Authorization", config);
+
+    const { suggestions } = response.body;
+    const requestingUser = await User.findOne({ username: testUser.username });
+
+    suggestions.forEach((suggestedUser) =>
+      expect(requestingUser.following).not.toContain(suggestedUser)
+    );
+
+    expect(suggestions.length).toBeLessThanOrEqual(3);
+  });
+
+  test("fails with status code 403 when the user gets someone else's suggestions", async () => {
+    const otherUser = helper.intialUsers[0];
+
+    await api
+      .get(`/api/users/${otherUser.username}/suggestions`)
+      .set("Authorization", config)
+      .expect(403);
+  });
+
+  test("fails with status code 400 when the user gets suggestions of an account that does not exist", async () => {
+    await api
+      .get(`/api/users/DoesNotExist/suggestions`)
+      .set("Authorization", config)
+      .expect(400);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
