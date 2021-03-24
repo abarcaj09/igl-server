@@ -4,6 +4,7 @@ const checkJWT = require("../utils/checkJWT");
 const {
   validateProfileEdits,
   validateIsOwnAccount,
+  validateProfileImage,
 } = require("../utils/validators");
 
 // GET
@@ -35,6 +36,20 @@ usersRouter.get(
 );
 
 // POST
+usersRouter.post(
+  "/images",
+  [checkJWT, validateProfileImage],
+  async (req, res) => {
+    const { image } = req.body;
+
+    const uploadResponse = await cloudinary.uploader.upload(image, {
+      upload_preset: "igl-profiles",
+    });
+
+    const url = uploadResponse.secure_url;
+    res.status(201).json({ url });
+  }
+);
 
 usersRouter.post("/:username/follow", checkJWT, async (req, res) => {
   const requestingUser = await User.findById(req.userId).select("following");

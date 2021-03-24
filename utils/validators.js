@@ -92,9 +92,64 @@ const validateIsOwnAccount = (req, res, next) => {
   next();
 };
 
+// Get the size of the image before it was encoded to a base64 string
+const getImageSize = (b64string) => {
+  const padding = b64string.slice(-2).match(/=/g);
+  return (b64string.length * 3) / 4 - (padding ? padding.length : 0);
+};
+
+const validateProfileImage = (req, res, next) => {
+  const { image } = req.body;
+  const imageSizeLimit = 7000000; // 7MB
+
+  if (!image) {
+    return res.status(400).json({ error: "No image was provided" });
+  }
+
+  if (getImageSize(image) > imageSizeLimit) {
+    return res
+      .status(400)
+      .json({ error: "Profile picture must be smaller than 7MB" });
+  }
+
+  next();
+};
+
+const validatePostImages = (req, res, next) => {
+  const base64strings = req.body;
+  const imageSizeLimit = 7000000; // 7MB
+  const totalSizeLimit = 20000000; // 20 MB
+  let totalSize = 0;
+
+  if (!base64strings || !base64strings.length) {
+    return res
+      .status(400)
+      .json({ error: "At least 1 image needs to be provided" });
+  }
+
+  for (const image of base64strings) {
+    const imageSize = getImageSize(image);
+    totalSize += imageSize;
+
+    if (imageSize > imageSizeLimit) {
+      return res.status(400).json({
+        error: "Each image must be smaller than 7MB",
+      });
+    } else if (totalSize > totalSizeLimit) {
+      return res
+        .status(400)
+        .json({ error: "Total size for all images must be less than 20MB" });
+    }
+  }
+
+  next();
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
   validateProfileEdits,
   validateIsOwnAccount,
+  validateProfileImage,
+  validatePostImages,
 };
