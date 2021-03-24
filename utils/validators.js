@@ -145,6 +145,18 @@ const validatePostImages = (req, res, next) => {
   next();
 };
 
+const validatePost = (req, res, next) => {
+  const { imageUrls } = req.body;
+
+  if (!imageUrls || !imageUrls.length) {
+    return res
+      .status(400)
+      .json({ error: "At least 1 image is needed to create a post" });
+  }
+
+  next();
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -152,4 +164,5 @@ module.exports = {
   validateIsOwnAccount,
   validateProfileImage,
   validatePostImages,
+  validatePost,
 };
