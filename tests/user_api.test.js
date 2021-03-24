@@ -155,7 +155,9 @@ describe("getting suggested profiles", () => {
       .get(`/api/users/${testUser.username}/suggestions`)
       .set("Authorization", config);
 
-    const { suggestions } = response.body;
+    const suggestions = response.body.suggestions.map(
+      (suggestedUser) => suggestedUser.id
+    );
     const requestingUser = await User.findOne({ username: testUser.username });
 
     suggestions.forEach((suggestedUser) =>
@@ -172,13 +174,6 @@ describe("getting suggested profiles", () => {
       .get(`/api/users/${otherUser.username}/suggestions`)
       .set("Authorization", config)
       .expect(403);
-  });
-
-  test("fails with status code 400 when the user gets suggestions of an account that does not exist", async () => {
-    await api
-      .get(`/api/users/DoesNotExist/suggestions`)
-      .set("Authorization", config)
-      .expect(400);
   });
 });
 
