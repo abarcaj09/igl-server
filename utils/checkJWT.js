@@ -5,7 +5,7 @@ const checkJWT = (req, res, next) => {
 
   if (authHeader && authHeader.toLowerCase().startsWith("bearer ")) {
     const token = authHeader.substring(7);
-    const verifiedToken = jwt.verify(token, process.env.SECRET);
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = verifiedToken.id;
     req.username = verifiedToken.username;
     next();

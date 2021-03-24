@@ -184,7 +184,11 @@ describe("logging in a user", () => {
       password: "password",
     };
 
-    await api.post("/api/auth/login").send(userLogin).expect(201);
+    await api
+      .post("/api/auth/login")
+      .send(userLogin)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
   });
 
   test("succeeds when account username and password are correct", async () => {
@@ -193,10 +197,14 @@ describe("logging in a user", () => {
       password: "password",
     };
 
-    await api.post("/api/auth/login").send(userLogin).expect(201);
+    await api
+      .post("/api/auth/login")
+      .send(userLogin)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
   });
 
-  test("fails when account email is correct and password is incorrect", async () => {
+  test("fails with status code 400 when account email is correct and password is incorrect", async () => {
     const userLogin = {
       account: existingUser.email,
       password: "wrongpassword",
@@ -205,7 +213,7 @@ describe("logging in a user", () => {
     await api.post("/api/auth/login").send(userLogin).expect(400);
   });
 
-  test("fails when account username is correct and password is incorrect", async () => {
+  test("fails with status code 400 when account username is correct and password is incorrect", async () => {
     const userLogin = {
       account: existingUser.username,
       password: "wrongpassword",
@@ -214,7 +222,7 @@ describe("logging in a user", () => {
     await api.post("/api/auth/login").send(userLogin).expect(400);
   });
 
-  test("fails when account email is incorrect and password is correct", async () => {
+  test("fails with status code 400 when account email is incorrect and password is correct", async () => {
     const userLogin = {
       account: "wrong@email.com",
       password: "password",
@@ -223,7 +231,7 @@ describe("logging in a user", () => {
     await api.post("/api/auth/login").send(userLogin).expect(400);
   });
 
-  test("fails when account username is incorrect and password is correct", async () => {
+  test("fails with status code 400 when account username is incorrect and password is correct", async () => {
     const userLogin = {
       account: "wrongUsername",
       password: "password",

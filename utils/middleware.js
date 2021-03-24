@@ -15,6 +15,7 @@ const unknownEndpoint = (req, res) => {
 };
 
 const errorHandler = (error, req, res, next) => {
+  log.error(error.name);
   log.error(error.message);
 
   if (error.name === "CastError") {

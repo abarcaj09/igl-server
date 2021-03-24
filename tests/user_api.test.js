@@ -8,12 +8,13 @@ const api = supertest(app);
 
 let config;
 let testUser;
+
 beforeEach(async () => {
   await User.deleteMany({});
   await User.insertMany(helper.intialUsers);
 
   const user = {
-    profilePic: "Test User",
+    name: "Test User",
     username: "test",
     email: "test@email.com",
     password: "testpassword",
@@ -21,9 +22,9 @@ beforeEach(async () => {
 
   const response = await api.post("/api/auth/register").send(user);
 
-  config = {
-    authorization: { Authorization: `Bearer ${response.body.token}` },
-  };
+  //   config = { Authorization: `Bearer ${response.body.token}` };
+  config = `Bearer ${response.body.token}`;
+  //   console.log("config: ", config);
 
   testUser = await User.findOne({ username: "test" });
 });
@@ -37,11 +38,14 @@ describe("Editing a user", () => {
       biography: "Test's biography",
     };
 
+    // console.log("========= config =========", config);
+
     await api
-      .put(`/api/user/${testuser.username}`)
-      .set(config)
+      .put(`/api/users/${testUser.username}`)
+      .set("Authorization", config)
       .send(edits)
-      .expect(201);
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
 
     const editedUser = await User.findOne({ username: "test" });
 
@@ -58,8 +62,8 @@ describe("Editing a user", () => {
     };
 
     await api
-      .put(`/api/user/${testuser.username}`)
-      .set(config)
+      .put(`/api/users/${testUser.username}`)
+      .set("Authorization", config)
       .send(edits)
       .expect(400);
   });
@@ -72,8 +76,8 @@ describe("Editing a user", () => {
     };
 
     await api
-      .put(`/api/user/${testuser.username}`)
-      .set(config)
+      .put(`/api/users/${testUser.username}`)
+      .set("Authorization", config)
       .send(edits)
       .expect(400);
   });
@@ -85,7 +89,11 @@ describe("Editing a user", () => {
       biography: "Test's biography",
     };
 
-    await api.put("/api/user/joe1").set(config).send(edits).expect(403);
+    await api
+      .put("/api/users/joe1")
+      .set("Authorization", config)
+      .send(edits)
+      .expect(403);
   });
 });
 
