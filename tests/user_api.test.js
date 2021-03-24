@@ -35,8 +35,6 @@ describe("Editing a user", () => {
       biography: "Test's biography",
     };
 
-    // console.log("========= config =========", config);
-
     await api
       .put(`/api/users/${testUser.username}`)
       .set("Authorization", config)
