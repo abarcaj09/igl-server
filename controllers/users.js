@@ -6,6 +6,34 @@ const {
   validateIsOwnAccount,
 } = require("../utils/validators");
 
+// GET
+
+// suggestions will be up to 3 accounts that the :username isn't following
+usersRouter.get(
+  "/:username/suggestions",
+  [checkJWT, validateIsOwnAccount],
+  async (req, res) => {
+    const user = await User.findOne({
+      username: req.params.username,
+    }).select("following");
+
+    if (!user) {
+      return res.status(400).json({ error: "Username does not exist" });
+    }
+
+    const suggestions = await User.find(
+      {
+        _id: {
+          $nin: [...user.following, user.id],
+        },
+      },
+      "username name profilePic"
+    ).limit(3);
+
+    res.json({ suggestions });
+  }
+);
+
 // POST
 
 usersRouter.post("/:username/follow", checkJWT, async (req, res) => {
