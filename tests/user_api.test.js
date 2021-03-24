@@ -22,10 +22,7 @@ beforeEach(async () => {
 
   const response = await api.post("/api/auth/register").send(user);
 
-  //   config = { Authorization: `Bearer ${response.body.token}` };
   config = `Bearer ${response.body.token}`;
-  //   console.log("config: ", config);
-
   testUser = await User.findOne({ username: "test" });
 });
 
