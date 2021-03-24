@@ -104,8 +104,8 @@ describe("following a user", () => {
     const requestingUser = await User.findOne({ username: testUser.username });
     const userToFollow = await User.findOne({ username: toFollow.username });
 
-    expect(requestingUser.following).toContain(userToFollow.id);
-    expect(userToFollow.followers).toContain(requestingUser.id);
+    expect(requestingUser.following.includes(userToFollow.id)).toBe(true);
+    expect(userToFollow.followers.includes(requestingUser.id)).toBe(true);
   });
 
   test("removes the user if the requesting user WAS already following", async () => {

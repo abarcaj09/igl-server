@@ -30,7 +30,7 @@ describe("registering a new user", () => {
     expect(usersAtEnd).toHaveLength(helper.intialUsers.length + 1);
 
     const usernames = usersAtEnd.map((user) => user.username);
-    expect(usernames).toContain("alex1");
+    expect(usernames).toContain(newUser.username);
   });
 
   test("fails with status code 400 if username is taken", async () => {
