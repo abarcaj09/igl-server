@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const checkJWT = (req, res, next) => {
   const authHeader = req.get("authorization");
+
   if (authHeader && authHeader.toLowerCase().startsWith("bearer ")) {
     const token = authHeader.substring(7);
     const verifiedToken = jwt.verify(token, process.env.SECRET);

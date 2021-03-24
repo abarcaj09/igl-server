@@ -61,4 +61,40 @@ const validateLogin = (req, res, next) => {
   next();
 };
 
-module.exports = { validateRegister, validateLogin };
+const validateProfileEdits = (req, res, next) => {
+  const { name, biography } = req.body;
+
+  if (!name || name.length < 2) {
+    return res
+      .status(400)
+      .json({ error: "Name can not be less than 2 characters long" });
+  }
+
+  if (biography && biography.length > 150) {
+    return res
+      .status(400)
+      .json({ error: "Biography can not be longer than 150 characters" });
+  }
+
+  next();
+};
+
+// validate that the requesting user is getting or modifying their own data
+const validateIsOwnAccount = (req, res, next) => {
+  const requestingUser = req.username; // from jwt
+  const account = req.params.username; // from route
+  if (requestingUser !== account) {
+    return res
+      .status(403)
+      .json({ error: "Can not access someone else's account" });
+  }
+
+  next();
+};
+
+module.exports = {
+  validateRegister,
+  validateLogin,
+  validateProfileEdits,
+  validateIsOwnAccount,
+};
