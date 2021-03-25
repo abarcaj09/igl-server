@@ -10,8 +10,8 @@ let config;
 let testUser;
 
 beforeEach(async () => {
-  Post.deleteMany({});
-  User.deleteMany({});
+  await Post.deleteMany({});
+  await User.deleteMany({});
 
   const user = {
     name: "Test User",
