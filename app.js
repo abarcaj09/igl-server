@@ -7,7 +7,7 @@ const middleware = require("./utils/middleware");
 const authRouter = require("./controllers/auth");
 const usersRouter = require("./controllers/users");
 const postsRouter = require("./controllers/posts");
-// const commentsRouter = require("./controllers/comments");   // TODO
+const commentsRouter = require("./controllers/comments");
 // const searchRouter = require("./controllers/search");  // TODO
 
 // Connect to DB
@@ -29,8 +29,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
-// TODO
-// app.use("/api/comments", commentsRouter);
+app.use("/api/comments", commentsRouter);
 // app.use("/api/search", searchRouter);
 
 // Error Handling Middleware

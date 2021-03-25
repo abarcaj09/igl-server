@@ -63,7 +63,7 @@ describe("creating a comment", () => {
 
     // comment was added to the post
     const postCommentedOn = await Post.findById(newComment.postId);
-    expect(postCommentedOn.comments).toContain(createdComment.id);
+    expect(postCommentedOn.comments.includes(createdComment.id)).toBe(true);
   });
 
   test("fails with status code 400 when comment length is less than 1", async () => {

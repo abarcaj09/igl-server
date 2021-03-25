@@ -157,6 +157,20 @@ const validatePost = (req, res, next) => {
   next();
 };
 
+const validateComment = (req, res, next) => {
+  const { comment, postId } = req.body;
+
+  if (!comment || comment.length < 1) {
+    return res
+      .status(400)
+      .json({ error: "Comment must be at least 1 character long" });
+  } else if (!postId) {
+    return res.status(400).json({ error: "A post ID needs to be provided" });
+  }
+
+  next();
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -165,4 +179,5 @@ module.exports = {
   validateProfileImage,
   validatePostImages,
   validatePost,
+  validateComment,
 };
