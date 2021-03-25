@@ -117,7 +117,7 @@ describe("deleting a comment", () => {
     expect(deletedComment).toBeNull();
 
     const postCommentedOn = await Post.findById(newComment.postId);
-    expect(postCommentedOn.comments).not.toContain(createdComment.id);
+    expect(postCommentedOn.comments).not.toContain(commentId);
   });
 
   test("fails with status code 400 if the comment does not exist", async () => {
@@ -145,12 +145,12 @@ describe("deleting a comment", () => {
       postId: testPost.id,
     };
 
-    const response = await api
+    const otherResponse = await api
       .post("/api/comments")
       .set("Authorization", otherUserConfig)
       .send(newComment);
 
-    const commentId = response.body.comment.id;
+    const commentId = otherResponse.body.comment.id;
 
     await api
       .delete(`/api/comments/${commentId}`)
