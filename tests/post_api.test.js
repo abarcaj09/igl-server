@@ -85,6 +85,118 @@ describe("creating a post", () => {
   });
 });
 
+describe("liking a post", () => {
+  let testPost;
+
+  beforeEach(async () => {
+    const newPost = {
+      imageUrls: [
+        "https://images.unsplash.com/photo-1616277434249-1ea8218b973d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+      ],
+      caption: "post to be liked",
+    };
+
+    await api.post("/api/posts/").set("Authorization", config).send(newPost);
+    testPost = await Post.findOne({ user: testUser.id });
+  });
+
+  test("adds a like if the user hasn't liked the post yet", async () => {
+    await api
+      .post(`/api/posts/${testPost.id}/likes`)
+      .set("Authorization", config)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    //   post is in user's likes
+    const requestingUser = await User.findOne({ username: testUser.username });
+    expect(requestingUser.likes.includes(testPost.id)).toBe(true);
+
+    // user is in post's likes
+    const likedPost = await Post.findById(testPost.id);
+    expect(likedPost.likes.includes(requestingUser.id)).toBe(true);
+  });
+
+  test("removes the like if the user has already liked the post", async () => {
+    // like the post
+    await api
+      .post(`/api/posts/${testPost.id}/likes`)
+      .set("Authorization", config);
+
+    await api
+      .post(`/api/posts/${testPost.id}/likes`)
+      .set("Authorization", config)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const requestingUser = await User.findOne({ username: testUser.username });
+    expect(requestingUser.likes).not.toContain(testPost.id);
+
+    const unlikedPost = await Post.findById(testPost.id);
+    expect(unlikedPost.likes).not.toContain(requestingUser.id);
+  });
+
+  test("fails with status code 400 if the post does not exist", async () => {
+    const nonExistingPostId = helper.nonExistingId();
+
+    await api
+      .post(`/api/posts/${nonExistingPostId}/likes`)
+      .set("Authorization", config)
+      .expect(400);
+  });
+});
+
+describe("saving a post", () => {
+  let testPost;
+
+  beforeEach(async () => {
+    const newPost = {
+      imageUrls: [
+        "https://images.unsplash.com/photo-1616277434249-1ea8218b973d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+      ],
+      caption: "post to be saved",
+    };
+
+    await api.post("/api/posts/").set("Authorization", config).send(newPost);
+    testPost = await Post.findOne({ user: testUser.id });
+  });
+  test("adds it to the user's saved posts if it had not been saved yet", async () => {
+    await api
+      .post(`/api/posts/${testPost.id}/save`)
+      .set("Authorization", config)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    //   post is in user's saved
+    const requestingUser = await User.findOne({ username: testUser.username });
+    expect(requestingUser.saved.includes(testPost.id)).toBe(true);
+  });
+
+  test("removes it from user's saved posts if it had already been saved", async () => {
+    // save the post
+    await api
+      .post(`/api/posts/${testPost.id}/save`)
+      .set("Authorization", config);
+
+    await api
+      .post(`/api/posts/${testPost.id}/save`)
+      .set("Authorization", config)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const requestingUser = await User.findOne({ username: testUser.username });
+    expect(requestingUser.saved).not.toContain(testPost.id);
+  });
+
+  test("fails with status code 400 if the post does not exist", async () => {
+    const nonExistingPostId = helper.nonExistingId();
+
+    await api
+      .post(`/api/posts/${nonExistingPostId}/save`)
+      .set("Authorization", config)
+      .expect(400);
+  });
+});
+
 // describe("deleting a post", () => {
 //   test("succeeds when the post exists and it was created by the requesting user", async () => {
 //     // create a post for testUser
