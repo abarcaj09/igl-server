@@ -94,6 +94,71 @@ describe("creating a comment", () => {
   });
 });
 
+describe("deleting a comment", () => {
+  test("succeeds if the user created the comment and the right comment id is given", async () => {
+    const newComment = {
+      comment: "this comment will be deleted",
+      postId: testPost.id,
+    };
+
+    const response = await api
+      .post("/api/comments")
+      .set("Authorization", config)
+      .send(newComment);
+
+    const commentId = response.body.comment.id;
+
+    await api
+      .delete(`/api/comments/${commentId}`)
+      .set("Authorization", config)
+      .expect(204);
+
+    const deletedComment = await Comment.findOne({ post: newComment.postId });
+    expect(deletedComment).toBeNull();
+
+    const postCommentedOn = await Post.findById(newComment.postId);
+    expect(postCommentedOn.comments).not.toContain(createdComment.id);
+  });
+
+  test("fails with status code 400 if the comment does not exist", async () => {
+    const nonExistingId = commentHelper.nonExistingId();
+
+    await api
+      .delete(`/api/comments/${nonExistingId}`)
+      .set("Authorization", config)
+      .expect(400);
+  });
+
+  test("fails with status code 403 when the requesting user tries to delete a comment they didn't create", async () => {
+    const otherUser = {
+      name: "Other User",
+      username: "other",
+      email: "other@email.com",
+      password: "otherpassword",
+    };
+
+    const response = await api.post("/api/auth/register").send(otherUser);
+    const otherUserConfig = `Bearer ${response.body.token}`;
+
+    const newComment = {
+      comment: "this comment will not be deleted",
+      postId: testPost.id,
+    };
+
+    const response = await api
+      .post("/api/comments")
+      .set("Authorization", otherUserConfig)
+      .send(newComment);
+
+    const commentId = response.body.comment.id;
+
+    await api
+      .delete(`/api/comments/${commentId}`)
+      .set("Authorization", config)
+      .expect(403);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
