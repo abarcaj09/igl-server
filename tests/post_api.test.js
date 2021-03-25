@@ -4,6 +4,7 @@ const User = require("../models/user");
 const supertest = require("supertest");
 const app = require("../app");
 const helper = require("./post_helper");
+const userHelper = require("./user_helper");
 
 const api = supertest(app);
 
@@ -267,6 +268,39 @@ describe("deleting a post", () => {
       .delete(`/api/posts/${otherUserPostId}`)
       .set("Authorization", config)
       .expect(403);
+  });
+});
+
+describe("getting a user's post previews", () => {
+  test("succeeds and contains images, likes, and comments", async () => {
+    const newPost = {
+      imageUrls: [
+        "https://images.unsplash.com/photo-1616277434249-1ea8218b973d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+      ],
+      caption: "post to be retrieved",
+    };
+
+    await api.post("/api/posts/").set("Authorization", config).send(newPost);
+
+    const reponse = await api
+      .get(`/api/posts/${testUser.username}/previews`)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const postPreviews = reponse.body.previews;
+    expect(postPreviews).toBeDefined();
+
+    postPreviews.forEach((post) => {
+      expect(post.images).toBeDefined();
+      expect(post.likes).toBeDefined();
+      expect(post.comments).toBeDefined();
+    });
+  });
+
+  test("fails with status code 400 if the user does not exist", async () => {
+    const nonExistingUsername = await userHelper.nonExistingUsername();
+
+    await api.get(`/api/posts/${nonExistingUsername}/previews`).expect(400);
   });
 });
 
