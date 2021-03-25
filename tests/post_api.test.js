@@ -42,7 +42,9 @@ describe("creating a post", () => {
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
-    const postCreator = User.findOne({ username: testUser.username }).populate({
+    const postCreator = await User.findOne({
+      username: testUser.username,
+    }).populate({
       path: "posts",
       select: "caption images",
     });
@@ -51,7 +53,13 @@ describe("creating a post", () => {
 
     expect(createdPost).toBeDefined();
     expect(createdPost.caption).toBe(newPost.caption);
-    expect(createdPost.images).toEqual(newPost.imageUrls);
+
+    // couldn't just use (images).toEqual(imageUrls) because images is of type CoreMongooseArray
+    // so the test was failing even though the arrays contained the same content
+    expect(createdPost.images).toEqual(
+      expect.arrayContaining(newPost.imageUrls)
+    );
+    expect(createdPost.images.length).toBe(newPost.imageUrls.length);
   });
 
   test("fails with status code 400 if no image urls are given", async () => {

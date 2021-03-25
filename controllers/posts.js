@@ -1,7 +1,8 @@
 const postsRouter = require("express").Router();
 const Post = require("../models/post");
+const User = require("../models/user");
 const checkJWT = require("../utils/checkJWT");
-const { validatePostImages } = require("../utils/validators");
+const { validatePostImages, validatePost } = require("../utils/validators");
 
 // POST
 
@@ -22,3 +23,29 @@ postsRouter.post(
     res.status(201).json({ urls });
   }
 );
+
+postsRouter.post("/", [checkJWT, validatePost], async (req, res) => {
+  const { imageUrls, caption } = req.body;
+  const user = await User.findById(req.userId);
+
+  const newPost = new Post({
+    images: imageUrls,
+    user: user._id,
+    caption,
+  });
+
+  const savedPost = await newPost.save();
+  user.posts = user.posts.concat(savedPost._id);
+  await user.save();
+
+  await savedPost
+    .populate({
+      path: "user",
+      select: "username name profilePic",
+    })
+    .execPopulate();
+
+  res.status(201).json({ post: savedPost });
+});
+
+module.exports = postsRouter;
