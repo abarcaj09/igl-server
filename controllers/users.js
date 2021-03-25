@@ -88,7 +88,7 @@ usersRouter.post("/:username/follow", checkJWT, async (req, res) => {
   toFollow.followers.splice(followerIndex, 1);
   await toFollow.save();
 
-  res.status(201).json({
+  res.json({
     following: requestingUser.following,
   });
 });

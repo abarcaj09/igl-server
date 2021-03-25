@@ -118,7 +118,7 @@ describe("following a user", () => {
     await api
       .post(`/api/users/${toFollow.username}/follow`)
       .set("Authorization", config)
-      .expect(201)
+      .expect(200)
       .expect("Content-Type", /application\/json/);
 
     const requestingUser = await User.findOne({ username: testUser.username });
