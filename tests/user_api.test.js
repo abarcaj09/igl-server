@@ -129,8 +129,10 @@ describe("following a user", () => {
   });
 
   test("fails with status code 400 if the user to follow does not exist", async () => {
+    const nonExistingUsername = helper.nonExistingUsername();
+
     await api
-      .post("/api/users/DoesNotExist/follow")
+      .post(`/api/users/${nonExistingUsername}/follow`)
       .set("Authorization", config)
       .expect(400);
   });

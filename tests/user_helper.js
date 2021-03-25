@@ -38,8 +38,27 @@ const allUsers = async () => {
   return users.map((user) => user.toJSON());
 };
 
+const nonExistingUsername = async () => {
+  const tempUser = new User({
+    name: "Brandon F.",
+    username: "brand",
+    email: "brandon@email.com",
+    password: "$2y$10$.PgmHCJP0mKicPs5YI.Dx.ItYByn2p3xGyF95CglVK66MopAbBcGe", // hash for "abc12345"
+  });
+
+  await tempUser.save();
+  await tempUser.remove();
+
+  return tempUser.username;
+};
+
 // biography must be less than 150 characters long
 const invalidLengthBio =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis"; // 151 characters
 
-module.exports = { intialUsers, allUsers, invalidLengthBio };
+module.exports = {
+  intialUsers,
+  allUsers,
+  invalidLengthBio,
+  nonExistingUsername,
+};
