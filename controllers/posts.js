@@ -1,6 +1,7 @@
 const postsRouter = require("express").Router();
 const Post = require("../models/post");
 const User = require("../models/user");
+const Comment = require("../models/comment");
 const checkJWT = require("../utils/checkJWT");
 const { validatePostImages, validatePost } = require("../utils/validators");
 
@@ -115,4 +116,40 @@ postsRouter.post("/:id/save", checkJWT, async (req, res) => {
     userSaved: user.saved,
   });
 });
+
+// DELETE routes
+
+postsRouter.delete("/:id", checkJWT, async (req, res) => {
+  const requestingUser = await User.findById(req.userId, "posts");
+  const toDelete = await Post.findById(req.params.id, "user likes");
+
+  if (!toDelete) {
+    return res.status(400).json({ error: "This post does not exist" });
+  } else if (requestingUser.id !== toDelete.user.toString()) {
+    return res
+      .status(403)
+      .json({ error: "Can not delete a post that you didn't create" });
+  }
+
+  // delete all comments associated with the post
+  await Comment.deleteMany({ post: toDelete.id });
+
+  // remove the post from those who liked and/or saved it
+  await User.updateMany(
+    { $or: [{ _id: { $in: toDelete.likes } }, { saved: toDelete.id }] },
+    { $pull: { likes: toDelete.id, saved: toDelete.id } }
+  );
+
+  // remove the post from the list of posts created by the user
+  requestingUser.posts = requestingUser.posts.filter(
+    (post) => post.toString() !== toDelete.id
+  );
+  await requestingUser.save();
+
+  // delete the post
+  await Post.findByIdAndDelete(toDelete.id);
+
+  res.status(204).end();
+});
+
 module.exports = postsRouter;
