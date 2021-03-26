@@ -9,6 +9,52 @@ const {
 
 // GET
 
+// home posts will be the most recent post from the people that :username
+// is following
+usersRouter.get(
+  "/:username/home",
+  [checkJWT, validateIsOwnAccount],
+  async (req, res) => {
+    const user = await User.findOne(
+      { username: req.params.username },
+      "following"
+    ).populate({
+      path: "following",
+      select: "posts ",
+      limit: 5,
+      populate: {
+        path: "posts",
+        options: { sort: { createdAt: -1 }, perDocumentLimit: 1 },
+        populate: [
+          { path: "user", select: "name username profilePic" },
+          {
+            path: "likes",
+            select: "name username profilePic",
+          },
+          {
+            path: "comments",
+            select: "comment createdAt",
+            perDocumentLimit: 2,
+            populate: {
+              path: "user",
+              select: "username",
+            },
+          },
+        ],
+      },
+    });
+
+    let homePosts = [];
+    for (const followedUser of user.following) {
+      if (followedUser.posts.length) {
+        homePosts.push(followedUser.posts[0]);
+      }
+    }
+
+    res.json({ posts: homePosts });
+  }
+);
+
 // suggestions will be up to 3 accounts that the :username isn't following
 usersRouter.get(
   "/:username/suggestions",
