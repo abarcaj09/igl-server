@@ -272,7 +272,7 @@ describe("deleting a post", () => {
 });
 
 describe("getting a user's post previews", () => {
-  test("succeeds and contains images, likes, and comments", async () => {
+  test("succeeds when the user exists and contains images, likes, and comments", async () => {
     const newPost = {
       imageUrls: [
         "https://images.unsplash.com/photo-1616277434249-1ea8218b973d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
@@ -301,6 +301,44 @@ describe("getting a user's post previews", () => {
     const nonExistingUsername = await userHelper.nonExistingUsername();
 
     await api.get(`/api/posts/${nonExistingUsername}/previews`).expect(400);
+  });
+});
+
+describe("getting a post by id", () => {
+  test("succeeds when the post exists and the retrieved post contains images, caption, user, likes, and comments", async () => {
+    const newPost = {
+      imageUrls: [
+        "https://images.unsplash.com/photo-1616277434249-1ea8218b973d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+      ],
+      caption: "post to be retrieved",
+    };
+
+    const response = await api
+      .post("/api/posts/")
+      .set("Authorization", config)
+      .send(newPost);
+
+    const postId = response.body.post.id;
+
+    const retrievedPostResponse = await api
+      .get(`/api/posts/${postId}`)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const retrievedPost = retrievedPostResponse.body.post;
+
+    expect(retrievedPost).not.toBeNull();
+    expect([...retrievedPost.images]).toEqual(newPost.imageUrls);
+    expect(retrievedPost.caption).toBe(newPost.caption);
+    expect(retrievedPost.user).not.toBeNull();
+    expect(retrievedPost.likes).not.toBeNull();
+    expect(retrievedPost.comments).not.toBeNull();
+  });
+
+  test("fails with status code 400 if the post does not exist", async () => {
+    const nonExistingId = await helper.nonExistingId();
+
+    await api.get(`/api/posts/${nonExistingId}`).expect(400);
   });
 });
 
