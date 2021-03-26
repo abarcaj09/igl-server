@@ -1,5 +1,6 @@
 const usersRouter = require("express").Router();
 const User = require("../models/user");
+const Post = require("../models/post");
 const checkJWT = require("../utils/checkJWT");
 const {
   validateProfileEdits,
@@ -8,6 +9,22 @@ const {
 } = require("../utils/validators");
 
 // GET
+
+// explore posts will be posts from users that :username isn't following
+usersRouter.get(
+  "/:username/explore",
+  [checkJWT, validateIsOwnAccount],
+  async (req, res) => {
+    const user = await User.findOne({ username: req.params.username }).select(
+      "following"
+    );
+    const posts = await Post.find({
+      user: { $nin: [...user.following, user.id] },
+    }).select("images likes comments caption user");
+
+    res.json({ posts });
+  }
+);
 
 // home posts will be the most recent post from the people that :username
 // is following
