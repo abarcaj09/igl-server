@@ -13,4 +13,17 @@ const nonExistingId = async () => {
   return tempPost.id;
 };
 
-module.exports = { nonExistingId };
+const initialPosts = [
+  {
+    images: ["imageurl1"],
+    caption: "init post 1",
+    user: "605bddbf3b7a5e728d95ac0e",
+  },
+  {
+    images: ["imageurl1", "imageurl2"],
+    caption: "init post 2",
+    user: "605bddbf3b7a5e728d95ac0e",
+  },
+];
+
+module.exports = { nonExistingId, initialPosts };

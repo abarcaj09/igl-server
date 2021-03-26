@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
+const Post = require("../models/post");
 const helper = require("./user_helper");
+const postHelper = require("./post_helper");
 const supertest = require("supertest");
 const app = require("../app");
 
@@ -174,6 +176,70 @@ describe("getting suggested profiles", () => {
 
     await api
       .get(`/api/users/${otherUser.username}/suggestions`)
+      .set("Authorization", config)
+      .expect(403);
+  });
+});
+
+describe("getting a user's home posts", () => {
+  beforeEach(async () => {
+    await Post.deleteMany({});
+    await Post.insertMany(postHelper.initialPosts);
+  });
+
+  test("succeeds and contains posts from users that the requesting user is following", async () => {
+    const followedUser = {
+      name: "Followed User",
+      username: "followed",
+      email: "followed@email.com",
+      password: "followedpassword",
+    };
+
+    const response = await api.post("/api/auth/register").send(followedUser);
+    const followedUserConfig = `Bearer ${response.body.token}`;
+
+    // create a post for followedUser
+    const newPost = {
+      imageUrls: [
+        "https://images.unsplash.com/photo-1616277434249-1ea8218b973d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+      ],
+      caption: "follwed's post",
+    };
+
+    await api
+      .post("/api/posts/")
+      .set("Authorization", followedUserConfig)
+      .send(newPost);
+
+    // testUser follows followedUser
+    await api
+      .post(`/api/users/${followedUser.username}/follow`)
+      .set("Authorization", config);
+
+    // testUser gets their home posts
+    const response = await api
+      .get(`/api/users/${testUser.username}/home`)
+      .set("Authorization", config)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const requestingUser = await User.findOne({ username: testUser.username });
+
+    const homePosts = response.body.posts;
+    expect(homePosts).not.toBeNull();
+
+    // homePosts should not include initial posts because testUser isn't following
+    // the user who created those posts
+    homePosts.forEach((post) => {
+      expect(requestingUser.following.includes(post.user.id)).toBe(true);
+    });
+  });
+
+  test("fails with status code 403 if the user tries to get another user's home posts", async () => {
+    const otherUser = helper.intialUsers[0];
+
+    await api
+      .get(`/api/users/${otherUser.username}/home`)
       .set("Authorization", config)
       .expect(403);
   });
