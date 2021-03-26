@@ -5,6 +5,26 @@ const Comment = require("../models/comment");
 const checkJWT = require("../utils/checkJWT");
 const { validatePostImages, validatePost } = require("../utils/validators");
 
+// GET
+
+postsRouter.get("/:username/previews", async (req, res) => {
+  const user = await User.findOne(
+    { username: req.params.username },
+    "posts"
+  ).populate({
+    path: "posts",
+    select: "images likes comments",
+    options: { sort: { createdAt: -1 } },
+    limit: 6,
+  });
+
+  if (!user) {
+    return res.status(400).json({ error: "User does not exist" });
+  }
+
+  res.json({ previews: user.posts });
+});
+
 // POST
 
 postsRouter.post(
