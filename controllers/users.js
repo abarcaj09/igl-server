@@ -7,6 +7,7 @@ const {
   validateIsOwnAccount,
   validateProfileImage,
 } = require("../utils/validators");
+const { cloudinary } = require("../utils/cloudinary");
 
 // GET
 

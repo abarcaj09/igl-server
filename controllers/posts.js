@@ -4,6 +4,7 @@ const User = require("../models/user");
 const Comment = require("../models/comment");
 const checkJWT = require("../utils/checkJWT");
 const { validatePostImages, validatePost } = require("../utils/validators");
+const { cloudinary } = require("../utils/cloudinary");
 
 // GET
 postsRouter.get("/:id", async (req, res) => {
