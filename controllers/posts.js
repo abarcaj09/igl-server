@@ -6,6 +6,25 @@ const checkJWT = require("../utils/checkJWT");
 const { validatePostImages, validatePost } = require("../utils/validators");
 
 // GET
+postsRouter.get("/:id", async (req, res) => {
+  const post = await Post.findById(req.params.id)
+    .populate({
+      path: "user",
+      select: "name username profilePic",
+    })
+    .populate({ path: "likes", select: "name username profilePic" })
+    .populate({
+      path: "comments",
+      select: "comment createdAt",
+      populate: { path: "user", select: "username profilePic" },
+    });
+
+  if (!post) {
+    return res.status(400).json({ error: "Post does not exist" });
+  }
+
+  res.json({ post });
+});
 
 postsRouter.get("/:username/previews", async (req, res) => {
   const user = await User.findOne(
