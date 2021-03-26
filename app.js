@@ -8,7 +8,7 @@ const authRouter = require("./controllers/auth");
 const usersRouter = require("./controllers/users");
 const postsRouter = require("./controllers/posts");
 const commentsRouter = require("./controllers/comments");
-// const searchRouter = require("./controllers/search");  // TODO
+const searchRouter = require("./controllers/search");
 
 // Connect to DB
 mongoose
@@ -30,7 +30,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/comments", commentsRouter);
-// app.use("/api/search", searchRouter);
+app.use("/api/search", searchRouter);
 
 // Error Handling Middleware
 app.use(middleware.unknownEndpoint);
