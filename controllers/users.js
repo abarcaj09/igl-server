@@ -10,6 +10,33 @@ const {
 
 // GET
 
+usersRouter.get("/:username", checkJWT, async (req, res) => {
+  const userProfile = await User.findOne({ username: req.params.username })
+    .populate({
+      path: "followers",
+      select: "username name profilePic",
+    })
+    .populate({ path: "following", select: "username name profilePic" })
+    .populate({
+      path: "posts",
+      select: "images likes comments",
+      sort: { createdAt: -1 },
+    })
+    .populate({ path: "saved", select: "images likes comments" });
+
+  if (!userProfile) {
+    return res.status(400).json({ error: "Profile does not exist" });
+  }
+
+  //   Send an empty saved field if the user profile isn't the requesting user's profile
+  if (userProfile.id !== req.userId) {
+    userProfile.saved = [];
+    userProfile.$ignore("saved");
+  }
+
+  res.json({ profile: userProfile });
+});
+
 // explore posts will be posts from users that :username isn't following
 usersRouter.get(
   "/:username/explore",
