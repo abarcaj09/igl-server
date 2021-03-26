@@ -291,9 +291,9 @@ describe("getting a user's post previews", () => {
     expect(postPreviews).toBeDefined();
 
     postPreviews.forEach((post) => {
-      expect(post.images).toBeDefined();
-      expect(post.likes).toBeDefined();
-      expect(post.comments).toBeDefined();
+      expect(post.images).not.toBeNull();
+      expect(post.likes).not.toBeNull();
+      expect(post.comments).not.toBeNull();
     });
   });
 
