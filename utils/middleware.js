@@ -20,6 +20,14 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "CastError") {
     return res.status(400).json({ error: "Malformatted ID" });
+  } else if (error.name === "JsonWebTokenError") {
+    return res
+      .status(401)
+      .json({ error: "Invalid token (Try logging in again)" });
+  } else if (error.name === "TokenExpiredError") {
+    return res
+      .status(401)
+      .json({ error: "Token expired (Try logging in again)" });
   }
 
   next(error);
