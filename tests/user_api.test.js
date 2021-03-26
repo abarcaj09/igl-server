@@ -278,6 +278,33 @@ describe("getting a user's explore posts", () => {
   });
 });
 
+describe("getting a user's profile", () => {
+  test("succeeds and contains the profile's followers, following, posts, and saved if the profile exists", async () => {
+    const response = await api
+      .get(`/api/users/${testUser.username}`)
+      .set("Authorization", config)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const profile = response.body.profile;
+    expect(profile).not.toBeNull();
+
+    expect(profile.followers).not.toBeNull();
+    expect(profile.following).not.toBeNull();
+    expect(profile.saved).not.toBeNull();
+    expect(profile.posts).not.toBeNull();
+  });
+
+  test("fails with status code 400 if the user tries to get a profile that does not exist", async () => {
+    const nonExistingUsername = await helper.nonExistingUsername();
+
+    await api
+      .get(`/api/users/${nonExistingUsername}`)
+      .set("Authorization", config)
+      .expect(400);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
