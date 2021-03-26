@@ -245,6 +245,39 @@ describe("getting a user's home posts", () => {
   });
 });
 
+describe("getting a user's explore posts", () => {
+  beforeEach(async () => {
+    await Post.deleteMany({});
+    await Post.insertMany(postHelper.initialPosts);
+  });
+
+  test("succeeds and contains posts from users that the requesting user is not following", async () => {
+    const response = await api
+      .get(`/api/users/${testUser.username}/explore`)
+      .set("Authorization", config)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const requestingUser = await User.findOne({ username: testUser.username });
+
+    const explorePosts = response.body.posts;
+    expect(explorePosts).not.toBeNull();
+
+    explorePosts.forEach((post) => {
+      expect(requestingUser.following).not.toContain(post.user.id);
+    });
+  });
+
+  test("fails with status code 403 if the user tries to get another user's explore posts", async () => {
+    const otherUser = helper.intialUsers[0];
+
+    await api
+      .get(`/api/users/${otherUser.username}/explore`)
+      .set("Authorization", config)
+      .expect(403);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
