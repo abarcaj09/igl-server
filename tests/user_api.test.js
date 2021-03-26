@@ -217,7 +217,7 @@ describe("getting a user's home posts", () => {
       .set("Authorization", config);
 
     // testUser gets their home posts
-    const response = await api
+    const homeResponse = await api
       .get(`/api/users/${testUser.username}/home`)
       .set("Authorization", config)
       .expect(200)
@@ -225,7 +225,7 @@ describe("getting a user's home posts", () => {
 
     const requestingUser = await User.findOne({ username: testUser.username });
 
-    const homePosts = response.body.posts;
+    const homePosts = homeResponse.body.posts;
     expect(homePosts).not.toBeNull();
 
     // homePosts should not include initial posts because testUser isn't following
