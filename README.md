@@ -34,7 +34,7 @@ npm install
 
 ### Environment Variables
 
-To run all of the scripts, the following envirnoment variables will need to be defined in a .env file.
+To run all of the scripts, the following environment variables will need to be defined in a .env file.
 
 - `MONGODB_URI`: Connection string to access your Mongo database.
 - `TEST_MONGODB_URI`: A separate connection string to access your Mongo database for testing purposes.
