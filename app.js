@@ -33,6 +33,9 @@ app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/comments", commentsRouter);
 app.use("/api/search", searchRouter);
+app.use("/", (req, res) => {
+  res.send("IGL-server");
+});
 
 // Error Handling Middleware
 app.use(middleware.unknownEndpoint);
