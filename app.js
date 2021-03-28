@@ -26,6 +26,7 @@ mongoose
 app.use(cors());
 app.use(express.json({ limit: "30MB" }));
 app.use(express.urlencoded({ limit: "30MB", extended: true }));
+app.use(middleware.requestLog);
 
 // Routes
 app.use("/api/auth", authRouter);
