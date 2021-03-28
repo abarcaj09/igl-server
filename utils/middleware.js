@@ -5,7 +5,7 @@ const log = require("./log");
 const requestLog = (req, res, next) => {
   log.info(`Method: ${req.method}`);
   log.info(`Path: ${req.path}`);
-  log.info(`Body: ${req.body}`);
+  log.info(`Body: ${JSON.stringify(req.body)}`);
   log.info("----");
   next();
 };
