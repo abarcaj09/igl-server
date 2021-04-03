@@ -1,6 +1,6 @@
 # IGL-SERVER
 
-IGL-SERVER is a RESTful API for the soon to be created IGL client. The server will handle requests made by the client such as: the creation/deletion of posts, following/unfollowing of users, creation/deletion of comments, etc. Requests can be made to the deployed version of this server at https://igl-server.herokuapp.com.
+IGL-SERVER is a RESTful API for [igl](https://igl.netlify.app), a webapp that is similar to [instagram](https://www.instagram.com). The server will handle requests made by the client such as: the creation/deletion of posts, following/unfollowing of users, creation/deletion of comments, etc. Requests can be made to the deployed version of this server at https://igl-server.herokuapp.com.
 
 ### Built With
 
